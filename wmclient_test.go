@@ -2,65 +2,58 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/lazynomad/waste-management/restclient"
 )
 
+// Mock HTTP client that implements the interface defined in the restclient package.
 type mockHTTPClient struct {
 }
-func (client *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	testStr := `{
-		"statusCode":200, 
-		"data": {
-			"access_token":"test.token.sign", 
-			"id":"1a2b3c4d5e6f"
-			}}`
-	resp := &http.Response{
-		StatusCode: 200,
-		Body: ioutil.NopCloser(bytes.NewBufferString(testStr)),
-	}
 
-	return resp, nil
+var (
+	// Used to call mockHTTPClient Do function.
+	// This function is used to define the test action when an HTTP call is executed.
+	doFunc func(req *http.Request) (*http.Response, error)
+)
+
+// Implementation method of mockHTTPClient following the interface defined in restclient package.
+func (client *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
+	return doFunc(req)
 }
 
+// Tests the flow of actions to fetch the Auth token
 func TestGetAuthToken(t *testing.T) {
 	testClient := getTestWmclient()
-	token, _ := testClient.GetAuthToken()
+
+	doFunc = func(*http.Request) (*http.Response, error) {
+		testStr := `{
+			"statusCode":200, 
+			"data": {
+				"access_token":"test.token.sign", 
+				"id":"1a2b3c4d5e6f"
+				}}`
+
+		return &http.Response{
+			StatusCode: 200,
+			Body: ioutil.NopCloser(bytes.NewBufferString(testStr)),
+		}, nil
+	}
+
+	token, err := testClient.GetAuthToken()
+
+	if (err != nil) {
+		t.Errorf("Failed with error" + err.Error())
+	}
+
 	if (token != "test.token.sign") {
 		t.Errorf("Wrong token" + token)
 	}
 }
 
-func TestJsonMarshall(t *testing.T) {
-	type authresp struct {
-		StatusCode int `json:"statusCode"`
-		Data struct {
-			AccessToken string `json:"access_token"`
-			ID string `json:"id"`
-		} `json:"data"`
-	}
-
-	testStr := `{
-		"statusCode":200, 
-		"data": {
-			"access_token":"test.token.sign", 
-			"id":"1a2b3c4d5e6f"
-			}}`
-	body := ioutil.NopCloser(bytes.NewBufferString(testStr))
-	resbody, _ := ioutil.ReadAll(body)
-	//respbody := []byte(testStr)
-	var p authresp
-	err := json.Unmarshal(resbody, &p)
-	if (err != nil) {
-		panic(err.Error())
-	}
-
-	fmt.Println(string(p.Data.AccessToken))
-}
-
+// Gets a wmclient stub with dummy configs over mock HTTP client
 func getTestWmclient() *WMClient {
 	conf := Config {
 		BaseURL: "https://test.url",
@@ -72,7 +65,7 @@ func getTestWmclient() *WMClient {
 	conf.APIKeys.Service = "1234567890"
 
 	HTTPClient := new(mockHTTPClient)
-	restClient := NewRestClient(HTTPClient)
+	restClient := restclient.NewRestClient(HTTPClient)
 
 	return NewWmClient(conf, *restClient)
 }

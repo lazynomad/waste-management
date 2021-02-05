@@ -1,4 +1,4 @@
-package main
+package restclient
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// HTTPClient interface that can be mocked
+// HTTPClient interface
 type HTTPClient interface {
 	Do(*http.Request) (*http.Response, error)
 }
@@ -16,7 +16,11 @@ type RestClient struct {
 	client HTTPClient
 }
 
-// Get call submits a request to the endpoint and returns the response
+// Get submits a HTTP GET request to the endpoint.
+// Returns:
+// 		Response code
+//		Response body
+//		Error code, if failed
 func (rest *RestClient) Get(url string, body []byte, headers map[string]string) (int, []byte, error) {
 	req, _ := http.NewRequest(http.MethodGet, url, bytes.NewBuffer(body))
 	for k, v := range headers {

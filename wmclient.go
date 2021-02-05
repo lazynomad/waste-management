@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"path"
+	"github.com/lazynomad/waste-management/restclient"
 )
 
 type authresp struct {
@@ -19,7 +20,7 @@ type authresp struct {
 // WMClient to communicate with waste management endpoint
 type WMClient struct {
 	conf Config
-	restClient RestClient
+	restClient restclient.RestClient
 }
 
 // GetAuthToken to get the JWT token from Waste-Management
@@ -81,7 +82,7 @@ func getDefaultHeaders() map[string]string {
 }
 
 // NewWmClient to construct waste management client
-func NewWmClient(conf Config, restClient RestClient) *WMClient {
+func NewWmClient(conf Config, restClient restclient.RestClient) *WMClient {
 	return &WMClient{
 		conf: conf,
 		restClient: restClient,
