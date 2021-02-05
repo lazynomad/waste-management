@@ -32,7 +32,7 @@ func main() {
 	defer confFile.Close()
 
 	// Deserialize the config from the file
-	var cfg Config
+	var cfg config
 	decoder := yaml.NewDecoder(confFile)
 	err = decoder.Decode(&cfg)
 	if (err != nil) {

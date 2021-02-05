@@ -55,7 +55,7 @@ func TestGetAuthToken(t *testing.T) {
 
 // Gets a wmclient stub with dummy configs over mock HTTP client
 func getTestWmclient() *WMClient {
-	conf := Config {
+	conf := config {
 		BaseURL: "https://test.url",
 	}
 	conf.Auth.User = "user"

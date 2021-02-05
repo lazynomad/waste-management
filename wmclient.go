@@ -9,21 +9,16 @@ import (
 	"github.com/lazynomad/waste-management/restclient"
 )
 
-type authresp struct {
-	StatusCode int `json:"statusCode"`
-	Data struct {
-		AccessToken string `json:"access_token"`
-		ID string `json:"id"`
-	} `json:"data"`
-}
-
 // WMClient to communicate with waste management endpoint
 type WMClient struct {
-	conf Config
+	conf config
 	restClient restclient.RestClient
 }
 
 // GetAuthToken to get the JWT token from Waste-Management
+// Returns:
+//		JWT token
+//		error, when failed
 func (wm *WMClient) GetAuthToken() (string, error) {
 	fullURL := genURL(wm.conf.BaseURL, "user/authenticate")
 	jsonVal := map[string]string{"username": wm.conf.Auth.User, "password": wm.conf.Auth.Pass, "locale": "en_US"}
@@ -38,7 +33,7 @@ func (wm *WMClient) GetAuthToken() (string, error) {
 	
 	if (respCode != 200) {
 		fmt.Printf("Failed. Code: %d. Body: %s", respCode, string(respBody))
-		errMsg := fmt.Sprintf("Unable to fetch auth token. Response code: %d", respCode)
+		errMsg := fmt.Sprintf("Unable to fetch auth token. Response code: %d. Body: %s", respCode, string(respBody))
 		return "", errors.New(errMsg)
 	}
 
@@ -47,8 +42,8 @@ func (wm *WMClient) GetAuthToken() (string, error) {
 		panic(err.Error())
 	}
 
-	fmt.Printf("status: %d - id: %s - token:%s", parsed.StatusCode, parsed.Data.ID, parsed.Data.AccessToken)
-
+	// To-Do: Replace fmt with logger
+	fmt.Printf("status: %d - id: %s - token:%s", parsed.StatusCode, parsed.Data.UserID, parsed.Data.AccessToken)
 	return parsed.Data.AccessToken, err
 }
 
@@ -82,7 +77,7 @@ func getDefaultHeaders() map[string]string {
 }
 
 // NewWmClient to construct waste management client
-func NewWmClient(conf Config, restClient restclient.RestClient) *WMClient {
+func NewWmClient(conf config, restClient restclient.RestClient) *WMClient {
 	return &WMClient{
 		conf: conf,
 		restClient: restClient,
