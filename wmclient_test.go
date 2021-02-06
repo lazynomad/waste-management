@@ -54,7 +54,7 @@ func TestGetAuthToken(t *testing.T) {
 }
 
 // Gets a wmclient stub with dummy configs over mock HTTP client
-func getTestWmclient() *WMClient {
+func getTestWmclient() WMClient {
 	conf := config {
 		BaseURL: "https://test.url",
 	}
@@ -67,5 +67,5 @@ func getTestWmclient() *WMClient {
 	HTTPClient := new(mockHTTPClient)
 	restClient := restclient.NewRestClient(HTTPClient)
 
-	return NewWmClient(conf, *restClient)
+	return NewWmClient(conf, restClient)
 }

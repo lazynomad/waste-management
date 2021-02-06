@@ -1,6 +1,6 @@
 package main
 
-// Config to hold conf
+// Config to hold the full application config
 type config struct {
 	BaseURL string `yaml:"baseurl"`
 	Auth struct {
@@ -14,6 +14,8 @@ type config struct {
 	} `yaml:"apikeys"`
 }
 
+// Authentication response model holding the Status code.
+// AccessToken is a JWT token
 type authresp struct {
 	StatusCode int `json:"statusCode"`
 	Data struct {
@@ -22,6 +24,7 @@ type authresp struct {
 	} `json:"data"`
 }
 
+// Account response containing account ID, which is used for the Scheduler rest calls
 type accountresp struct {
 	StatusCode int `json:"statusCode"`
 	Data struct {
@@ -32,6 +35,7 @@ type accountresp struct {
 	} `json:"data"`
 }
 
+// Scheduler response. The same model represents both Trash and Recycling service schedules
 type scheduleresp struct {
 	ServiceID int `json:"serviceId"`
 	NextPickup struct {

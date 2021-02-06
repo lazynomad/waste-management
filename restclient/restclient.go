@@ -36,9 +36,9 @@ func (rest *RestClient) Post(url string, body []byte, headers map[string]string)
 	return rest.send(req, headers)
 }
 
-// NewRestClient to construct rest client
-func NewRestClient(httpClient HTTPClient) *RestClient {
-	return &RestClient{client: httpClient}
+// NewRestClient to construct the rest client
+func NewRestClient(httpClient HTTPClient) RestClient {
+	return RestClient{client: httpClient}
 }
 
 func (rest *RestClient) send(req *http.Request, headers map[string]string) (int, []byte, error) {
